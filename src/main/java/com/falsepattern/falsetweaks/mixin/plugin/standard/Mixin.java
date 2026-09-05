@@ -50,6 +50,7 @@ import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Littl
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Malisis;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Malisis_NH;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.NotFine;
+import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.Neodymium;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.NuclearControl;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.OpenComputers;
 import static com.falsepattern.falsetweaks.mixin.plugin.standard.TargetMod.OptiFine;
@@ -195,6 +196,19 @@ public enum Mixin implements IMixins {
                            "threadedupdates.BlockMixin",
                            "threadedupdates.blockbounds.BlockMixin_Root",
                            "threadedupdates.blockbounds.BlockMixin_Impl")),
+    ThreadedUpdates_NeodymiumBackend(Phase.EARLY,
+                                      ModuleConfig::THREADED_CHUNK_UPDATES,
+                                      require(Neodymium),
+                                      client("threadedupdates.neodymiumcompat.RenderBlocksMixin",
+                                             "threadedupdates.neodymiumcompat.RenderGlobalMixin",
+                                             "threadedupdates.neodymiumcompat.WorldRendererMixin",
+                                             "threadedupdates.neodymiumcompat.TessellatorCaptureMixin")),
+    ThreadedUpdates_Neodymium_OptiFine(Phase.EARLY,
+                                       ModuleConfig::THREADED_CHUNK_UPDATES,
+                                       mods(require(Neodymium), require(OptiFine)),
+                                       client("threadedupdates.neodymiumcompat.optifine.GameSettingsMixin",
+                                              "threadedupdates.neodymiumcompat.optifine.TessellatorMixin",
+                                              "threadedupdates.neodymiumcompat.optifine.WorldClientMixin")),
     ThreadedUpdates_blockBounds(Phase.EARLY,
                                 () -> ModuleConfig.THREADED_CHUNK_UPDATES() && ThreadingConfig.FAST_THREADED_BLOCK_BOUNDS,
                                 client("threadedupdates.blockbounds.BlockMixin_FastImpl")),

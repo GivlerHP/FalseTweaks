@@ -63,6 +63,14 @@ public class Compat {
         return BEDDIUM.PRESENT;
     }
 
+    /**
+     * Neodymium Unofficial terrain backend. Kept class-reference free so FalseTweaks still
+     * starts cleanly when Neodymium is absent.
+     */
+    public static boolean neodymiumInstalled() {
+        return NEODYMIUM.PRESENT;
+    }
+
     public static void applyCompatibilityTweaks() {
         ThreadingCompat.init();
         if (Loader.isModLoaded("apparatus")) {
@@ -163,6 +171,21 @@ public class Compat {
             boolean present;
             try {
                 present = Launch.classLoader.getClassBytes("me.eigenraven.lwjgl3ify.core.Lwjgl3ifyCoremod") != null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                present = false;
+            }
+            PRESENT = present;
+        }
+    }
+
+    private static class NEODYMIUM {
+        private static final boolean PRESENT;
+
+        static {
+            boolean present;
+            try {
+                present = Launch.classLoader.getClassBytes("makamys.neodymium.Neodymium") != null;
             } catch (IOException e) {
                 e.printStackTrace();
                 present = false;

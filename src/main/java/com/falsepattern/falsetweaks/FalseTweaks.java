@@ -89,15 +89,17 @@ public class FalseTweaks {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        if (Loader.isModLoaded("neodymium")) {
-            createSidedException("FalseTweaks is not compatible with Neodymium since 4.0.0.\n" +
-                                 "Replace Neodymium with Beddium.");
+        // Ariamis compatibility fork: FalseTweaks 4.x normally hard-blocks Neodymium.
+        // The legacy split-build backend is restored when Neodymium is present without Beddium.
+        if (Compat.neodymiumInstalled() && Compat.beddiumInstalled()) {
+            createSidedException("Beddium and Neodymium must not be installed together.\n" +
+                                 "Keep exactly one chunk renderer backend.");
         }
         if (Loader.isModLoaded("optifine")) {
-            if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-                createSidedException("FalseTweaks threaded rendering is not compatible with OptiFine since 4.0.0.\n" +
-                                     "Disable threaded rendering, or replace OptiFine with Beddium " +
-                                     "(and SwanSong if you want shaders).");
+            if (ModuleConfig.THREADED_CHUNK_UPDATES() && !Compat.neodymiumInstalled()) {
+                createSidedException("FalseTweaks threaded rendering with the Beddium backend is not compatible with OptiFine.\n" +
+                                     "Disable threaded rendering, or replace OptiFine with Beddium/SwanSong.\n" +
+                                     "OptiFine is supported when the Neodymium compatibility backend is selected.");
             }
         }
         if (Loader.isModLoaded("animfix")) {

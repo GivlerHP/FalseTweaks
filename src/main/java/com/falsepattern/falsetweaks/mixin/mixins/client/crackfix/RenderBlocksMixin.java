@@ -200,15 +200,23 @@ public abstract class RenderBlocksMixin {
         renderMaxX += EPSILON;
         renderMaxY += EPSILON;
         renderMaxZ += EPSILON;
-        switch (skipDir) {
-            // @formatter:off
-            case FACE_XNEG: renderMinX = ft$crack$bounds[0]; break;
-            case FACE_YNEG: renderMinY = ft$crack$bounds[1]; break;
-            case FACE_ZNEG: renderMinZ = ft$crack$bounds[2]; break;
-            case FACE_XPOS: renderMaxX = ft$crack$bounds[3]; break;
-            case FACE_YPOS: renderMaxY = ft$crack$bounds[4]; break;
-            case FACE_ZPOS: renderMaxZ = ft$crack$bounds[5]; break;
-            // @formatter:on
+        // Do not use an enum switch here. javac generates a synthetic RenderBlocksMixin$1
+        // switch-map helper for enum switches. Mixin renames that helper when merging this
+        // class into RenderBlocks, but on legacy LaunchWrapper/Mixin stacks the renamed
+        // helper may not be loadable at runtime (NoClassDefFoundError on
+        // RenderBlocks$Anonymous$...). Direct comparisons generate no companion class.
+        if (skipDir == Facing.Direction.FACE_XNEG) {
+            renderMinX = ft$crack$bounds[0];
+        } else if (skipDir == Facing.Direction.FACE_YNEG) {
+            renderMinY = ft$crack$bounds[1];
+        } else if (skipDir == Facing.Direction.FACE_ZNEG) {
+            renderMinZ = ft$crack$bounds[2];
+        } else if (skipDir == Facing.Direction.FACE_XPOS) {
+            renderMaxX = ft$crack$bounds[3];
+        } else if (skipDir == Facing.Direction.FACE_YPOS) {
+            renderMaxY = ft$crack$bounds[4];
+        } else if (skipDir == Facing.Direction.FACE_ZPOS) {
+            renderMaxZ = ft$crack$bounds[5];
         }
     }
 

@@ -171,8 +171,10 @@ public class ModuleConfig {
     public static boolean ADVANCED_PROFILER;
 
     @Config.Comment({"Enables multi-threaded chunk updating.",
-                     "Requires Beddium installed.",
-                     "FPS impact: Significant FPS and world rendering speed gains with Beddium."})
+                     "Requires Beddium or Neodymium Unofficial installed.",
+                     "Neodymium compatibility uses the legacy split-build path: thread-safe blocks are meshed on workers",
+                     "and merged into the normal WorldRenderer pass on the client thread.",
+                     "FPS impact: Significant world rendering speed gains on supported backends."})
     @Config.LangKey("config.falsetweaks.threading")
     @Config.Name(value = "threadedChunkUpdates",
                  migrations = "")
@@ -327,7 +329,7 @@ public class ModuleConfig {
     }
 
     public static boolean THREADED_CHUNK_UPDATES() {
-        return Compat.beddiumInstalled() && THREADED_CHUNK_UPDATES;
+        return (Compat.beddiumInstalled() || Compat.neodymiumInstalled()) && THREADED_CHUNK_UPDATES;
     }
 
     //This is here to make the static initializer run

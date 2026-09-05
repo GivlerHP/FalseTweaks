@@ -38,6 +38,7 @@ public enum TargetMod implements ITargetMod {
     FoamFix("pl.asie.foamfix.coremod.FoamFixCore"),
     FastCraft("fastcraft.Tweaker"),
     NotFine("jss.notfine.NotFine"),
+    Neodymium("makamys.neodymium.Neodymium"),
     OpenComputers("li.cil.oc.OpenComputers"),
     OptiFine("Config"),
     OptiFineShadersMod("shadersmod.client.Shaders"),

@@ -22,8 +22,10 @@
 
 package com.falsepattern.falsetweaks.asm;
 
+import com.falsepattern.falsetweaks.Compat;
+
 import com.falsepattern.falsetweaks.asm.modules.occlusion.optifine.RenderGlobalDeOptimizer;
-import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_TessellatorUseReplacement;
+import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_RenderBlocksASM;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.Threading_ThreadSafeBlockRendererInjector;
 import com.falsepattern.falsetweaks.asm.modules.threadedupdates.compat.Threading_AngelicaCompatFixer;
 import com.falsepattern.falsetweaks.config.ModuleConfig;
@@ -59,9 +61,25 @@ public class FalseTweaksTransformer extends MergeableTurboTransformer {
         if (FMLLaunchHandler.side()
                             .isClient()) {
             if (ModuleConfig.THREADED_CHUNK_UPDATES()) {
-                transformers.add(new RenderGlobalDeOptimizer());
+                final boolean neodymiumBackend = Compat.neodymiumInstalled() && !Compat.beddiumInstalled();
+
+                // OptiFine rewrites RenderGlobal.worldRenderersToUpdate to CompactArrayList.
+                // The 4.x RenderGlobalDeOptimizer rewrites CompactArrayList call owners to
+                // java/util/List without changing INVOKEVIRTUAL to INVOKEINTERFACE, which
+                // causes an IncompatibleClassChangeError on OptiFine E7.  The restored
+                // Neodymium backend does not need this deoptimizer: its RenderGlobal mixin
+                // accesses the update list reflectively and wraps CompactArrayList safely.
+                // Keep the stock transformer only for the normal 4.x/Beddium path.
+                if (!neodymiumBackend) {
+                    transformers.add(new RenderGlobalDeOptimizer());
+                }
+
                 transformers.add(new Threading_AngelicaCompatFixer());
                 transformers.add(new Threading_ThreadSafeBlockRendererInjector());
+                if (neodymiumBackend) {
+                    // Required by the restored 3.9.x-style split-build backend.
+                    transformers.add(new Threading_RenderBlocksASM());
+                }
             }
         }
         return transformers;

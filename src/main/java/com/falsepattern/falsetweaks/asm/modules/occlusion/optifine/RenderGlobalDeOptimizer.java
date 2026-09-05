@@ -27,6 +27,7 @@ import com.falsepattern.lib.turboasm.ClassNodeHandle;
 import com.falsepattern.lib.turboasm.TurboClassTransformer;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -85,6 +86,10 @@ public class RenderGlobalDeOptimizer implements TurboClassTransformer {
                     val mInsn = (MethodInsnNode) insn;
                     if (BAD_METHOD_OWNER.equals(mInsn.owner)) {
                         mInsn.owner = TARGET_METHOD_OWNER;
+                        // CompactArrayList calls arrive as INVOKEVIRTUAL. java.util.List is
+                        // an interface, so the opcode/itf flag must be changed as well.
+                        mInsn.setOpcode(Opcodes.INVOKEINTERFACE);
+                        mInsn.itf = true;
                         modified = true;
                     }
                 } else if (insn instanceof TypeInsnNode) {

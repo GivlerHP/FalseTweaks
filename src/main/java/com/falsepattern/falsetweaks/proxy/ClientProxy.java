@@ -33,6 +33,7 @@ import com.falsepattern.falsetweaks.modules.dynlights.DynamicLightsDrivers;
 import com.falsepattern.falsetweaks.modules.renderlists.ItemRenderListManager;
 import com.falsepattern.falsetweaks.modules.renderlists.VoxelRenderListManager;
 import com.falsepattern.falsetweaks.modules.threadedupdates.saftey.ThreadSafeBlockRendererMap;
+import com.falsepattern.falsetweaks.modules.threadedupdates.neodymium.NeodymiumChunkUpdateScheduler;
 import com.falsepattern.falsetweaks.modules.triangulator.calibration.Calibration;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSection;
 import com.falsepattern.falsetweaks.modules.voxelizer.loading.LayerMetadataSerializer;
@@ -113,6 +114,8 @@ public class ClientProxy extends CommonProxy {
             } else {
                 BeddiumBridge.registerBasicProvider();
             }
+        } else if (Compat.neodymiumInstalled() && ModuleConfig.THREADED_CHUNK_UPDATES()) {
+            NeodymiumChunkUpdateScheduler.register();
         }
         FMLCommonHandler.instance()
                         .bus()
