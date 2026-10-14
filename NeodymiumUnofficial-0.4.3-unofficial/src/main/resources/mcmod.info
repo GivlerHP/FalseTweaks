@@ -1,0 +1,15 @@
+[
+{
+  "modid": "${modId}",
+  "name": "${modName}",
+  "description": "Improves performance by reimplementing chunk rendering using modern OpenGL.",
+  "version": "${modVersion}",
+  "mcversion": "${minecraftVersion}",
+  "url": "https://github.com/FalsePattern/Neodymium-Unofficial",
+  "updateUrl": "",
+  "authorList": ["makamys", "FalsePattern", "Ven"],
+  "logoFile": "NDico.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]

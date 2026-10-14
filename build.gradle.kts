@@ -245,11 +245,13 @@ repositories {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
     implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.12.2")
     compileOnly("org.joml:joml:1.10.8")
     compileOnly("it.unimi.dsi:fastutil:8.5.18")
     compileOnly("mega:megatraceservice:1.3.0")
     compileOnly("com.ventooth:swansong-mc1.7.10:1.3.4:dev")
+    compileOnly(files("libs/neodymium-mc1.7.10-0.4.3-unofficial-dev.jar"))
     compileOnly("maven.modrinth:etfuturum:2.6.2:dev")
     add(panamaNatives.compileOnlyConfigurationName, "com.falsepattern:zanama-rt:0.3.0")
 

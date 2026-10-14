@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "FalsePattern's flagship tweaking, patching, and optimization mod.",
+    "version": "${modVersion}",
+    "mcversion": "${minecraftVersion}",
+    "url": "https://github.com/FalsePattern/FalseTweaks",
+    "authorList": [
+      "FalsePattern"
+    ],
+    "parent": "",
+    "dependencies": [
+      "falsepatternlib"
+    ],
+    "credits": "celeron55, CoFH Team, embeddedt, makamys, papuja, Ven"
+  }
+]

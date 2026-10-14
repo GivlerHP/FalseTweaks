@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.renderer.RenderGlobal;
@@ -97,6 +98,22 @@ public abstract class RenderGlobalMixin {
     @Inject(method = "loadRenderers", at = @At("RETURN"), require = 1)
     private void ft$reloadNeodymiumWorkers(CallbackInfo ci) {
         NeodymiumChunkUpdateScheduler.INSTANCE.reload((RenderGlobal) (Object) this);
+    }
+
+    @Inject(method = "setWorldAndLoadRenderers", at = @At("HEAD"), require = 1)
+    private void ft$stopPreviousWorldWorkers(CallbackInfo ci) {
+        // Unloading a world does not call loadRenderers, so stop the old session explicitly.
+        NeodymiumChunkUpdateScheduler.INSTANCE.reload(null);
+    }
+
+    @Redirect(method = "markBlocksForUpdate",
+              at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/WorldRenderer;needsUpdate:Z"),
+              require = 1)
+    private boolean ft$invalidatePendingSnapshot(WorldRenderer renderer) {
+        // Vanilla does not call markDirty again for an already dirty section. Its in-flight
+        // snapshot must still be invalidated when another block/light update arrives.
+        NeodymiumChunkUpdateScheduler.INSTANCE.cancel(renderer);
+        return renderer.needsUpdate;
     }
 
     /**

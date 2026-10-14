@@ -26,10 +26,12 @@ public abstract class WorldRendererMixin implements IRendererUpdateTaskHolder {
 
     @Override
     public UpdateTask ft$getNeodymiumUpdateTask() {
-        if (ft$neodymiumUpdateTask == null) {
-            ft$neodymiumUpdateTask = new UpdateTask();
-        }
         return ft$neodymiumUpdateTask;
+    }
+
+    @Override
+    public void ft$setNeodymiumUpdateTask(UpdateTask task) {
+        ft$neodymiumUpdateTask = task;
     }
 
     @Redirect(method = "updateRenderer",
@@ -38,7 +40,7 @@ public abstract class WorldRendererMixin implements IRendererUpdateTaskHolder {
               require = 1)
     private void ft$mergeWorkerGeometry(WorldRenderer instance, int pass, EntityLivingBase entity) {
         UpdateTask task = ft$getNeodymiumUpdateTask();
-        if (pass >= 0 && pass < 2 && task.started && task.finished && !task.cancelled) {
+        if (pass >= 0 && pass < 2 && task != null && task.committing) {
             ((ICapturableTessellator) ThreadTessellator.mainThreadTessellator())
                     .ft$appendVertexState(task.result[pass].vertexState);
         }
@@ -47,6 +49,11 @@ public abstract class WorldRendererMixin implements IRendererUpdateTaskHolder {
 
     @Inject(method = "markDirty", at = @At("RETURN"), require = 1)
     private void ft$cancelWorkerBuild(CallbackInfo ci) {
+        NeodymiumChunkUpdateScheduler.INSTANCE.cancel((WorldRenderer) (Object) this);
+    }
+
+    @Inject(method = "setDontDraw", at = @At("HEAD"), require = 1)
+    private void ft$cancelObsoleteGeometry(CallbackInfo ci) {
         NeodymiumChunkUpdateScheduler.INSTANCE.cancel((WorldRenderer) (Object) this);
     }
 }

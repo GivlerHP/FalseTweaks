@@ -5,6 +5,7 @@ import com.falsepattern.falsetweaks.modules.threadedupdates.neodymium.NeodymiumC
 import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -13,11 +14,13 @@ import net.minecraftforge.client.ForgeHooksClient;
 
 @Mixin(RenderBlocks.class)
 public abstract class RenderBlocksMixin {
+    @Shadow public boolean renderFromInside;
+    @Shadow public boolean renderAllFaces;
     /** Called by Threading_RenderBlocksASM. 0=continue, 1=false, 2=true. */
     @SuppressWarnings("unused")
     @Unique
-    private int ft$cancelRenderDelegatedToDifferentThread(Block block, int renderType) {
-        if (!MainThreadContainer.isMainThread() || !NeodymiumChunkUpdateScheduler.shouldRenderOffThread(block)) {
+    private int ft$cancelRenderDelegatedToDifferentThread(Block block, int renderType, int x, int y, int z) {
+        if (!MainThreadContainer.isMainThread() || renderFromInside || renderAllFaces) {
             return 0;
         }
         int pass = ForgeHooksClient.getWorldRenderPass();
@@ -29,7 +32,7 @@ public abstract class RenderBlocksMixin {
             return 0;
         }
         UpdateTask task = NeodymiumChunkUpdateScheduler.task(wr);
-        if (!task.started || !task.finished || task.cancelled) {
+        if (task == null || !task.committing || !task.result[pass].built(x - task.x, y - task.y, z - task.z)) {
             return 0;
         }
         return task.result[pass].renderedSomething ? 2 : 1;

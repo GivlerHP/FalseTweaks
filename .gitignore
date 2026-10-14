@@ -108,6 +108,7 @@ fabric.properties
 
 # Package Files #
 *.jar
+!libs/neodymium-mc1.7.10-0.4.3-unofficial-dev.jar
 *.war
 *.nar
 *.ear

@@ -26,7 +26,7 @@ import com.falsepattern.falsetweaks.Tags;
 import com.falsepattern.lib.config.Config;
 import com.falsepattern.lib.config.ConfigurationManager;
 
-@Config.Comment("Multithreaded rendering settings. Also look at the occlusion category.")
+@Config.Comment("Multithreaded rendering settings. Legacy 3.x occlusion settings are not used by this backend.")
 @Config(modid = Tags.MOD_ID,
         category = "threading")
 @Config.LangKey
@@ -41,6 +41,14 @@ public class ThreadingConfig {
     @Config.RangeInt(min = 1,
                      max = 8)
     public static int CHUNK_UPDATE_THREADS;
+
+    @Config.Comment({"Time budget in milliseconds for Neodymium chunk commits per frame.",
+                     "A single chunk commit cannot be interrupted and can exceed this budget.",
+                     "Lower values favor frame rate; higher values load terrain faster."})
+    @Config.Name("neodymiumMainThreadBudgetMs")
+    @Config.DefaultInt(2)
+    @Config.RangeInt(min = 1, max = 20)
+    public static int NEODYMIUM_MAIN_THREAD_BUDGET;
 
     @Config.Comment("Disable this to use a slower, but more accurate thread safety check in the tessellator.")
     @Config.LangKey

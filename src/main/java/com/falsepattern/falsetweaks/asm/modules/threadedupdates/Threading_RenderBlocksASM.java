@@ -96,10 +96,13 @@ public class Threading_RenderBlocksASM implements TurboClassTransformer {
         list.add(new VarInsnNode(Opcodes.ALOAD, 0));
         list.add(new VarInsnNode(Opcodes.ALOAD, 1));
         list.add(new VarInsnNode(Opcodes.ILOAD, 5));
+        list.add(new VarInsnNode(Opcodes.ILOAD, 2));
+        list.add(new VarInsnNode(Opcodes.ILOAD, 3));
+        list.add(new VarInsnNode(Opcodes.ILOAD, 4));
         list.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
                                     "net/minecraft/client/renderer/RenderBlocks",
                                     "ft$cancelRenderDelegatedToDifferentThread",
-                                    "(Lnet/minecraft/block/Block;I)I",
+                                    "(Lnet/minecraft/block/Block;IIII)I",
                                     false));
         val lbl = new LabelNode();
         list.add(new InsnNode(Opcodes.DUP));

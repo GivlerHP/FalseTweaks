@@ -3,7 +3,7 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.threadedupdates.neodymi
 import com.falsepattern.falsetweaks.modules.threading.MainThreadContainer;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -14,9 +14,11 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.ISaveHandler;
 
+import java.lang.reflect.Field;
+
 @Mixin(WorldClient.class)
 public abstract class WorldClientMixin extends World {
-    @Dynamic @Shadow(remap = false) public boolean renderItemInFirstPerson;
+    @Unique private static Field ft$renderItemInFirstPersonField;
 
     protected WorldClientMixin(ISaveHandler saveHandler, String name, WorldProvider provider,
                                WorldSettings settings, Profiler profiler) {
@@ -28,8 +30,20 @@ public abstract class WorldClientMixin extends World {
               at = @At(value = "FIELD",
                        target = "Lnet/minecraft/client/multiplayer/WorldClient;renderItemInFirstPerson:Z",
                        remap = false),
-              require = 1)
+              require = 0)
     private boolean ft$noHandLightOffThread(WorldClient self) {
-        return renderItemInFirstPerson && MainThreadContainer.isMainThread();
+        if (!MainThreadContainer.isMainThread()) {
+            return false;
+        }
+        try {
+            Field field = ft$renderItemInFirstPersonField;
+            if (field == null) {
+                field = self.getClass().getField("renderItemInFirstPerson");
+                ft$renderItemInFirstPersonField = field;
+            }
+            return field.getBoolean(self);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Could not access OptiFine hand-light state", e);
+        }
     }
 }

@@ -17,7 +17,9 @@ import java.util.List;
  */
 public final class OptiFineUpdateListAdapter extends AbstractList<WorldRenderer> {
     private final Object delegate;
+    private final ICompactUpdateList direct;
     private final Method get;
+    private final Method set;
     private final Method size;
     private final Method addAt;
     private final Method removeAt;
@@ -25,9 +27,15 @@ public final class OptiFineUpdateListAdapter extends AbstractList<WorldRenderer>
 
     private OptiFineUpdateListAdapter(Object delegate) {
         this.delegate = delegate;
+        direct = delegate instanceof ICompactUpdateList ? (ICompactUpdateList) delegate : null;
+        if (direct != null) {
+            get = set = size = addAt = removeAt = clear = null;
+            return;
+        }
         Class<?> type = delegate.getClass();
         try {
             get = type.getMethod("get", int.class);
+            set = type.getMethod("set", int.class, Object.class);
             size = type.getMethod("size");
             addAt = type.getMethod("add", int.class, Object.class);
             removeAt = type.getMethod("remove", int.class);
@@ -54,30 +62,37 @@ public final class OptiFineUpdateListAdapter extends AbstractList<WorldRenderer>
 
     @Override
     public WorldRenderer get(int index) {
-        return (WorldRenderer) invoke(get, index);
+        return (WorldRenderer) (direct != null ? direct.ft$get(index) : invoke(get, index));
+    }
+
+    @Override
+    public WorldRenderer set(int index, WorldRenderer element) {
+        return (WorldRenderer) (direct != null ? direct.ft$set(index, element) : invoke(set, index, element));
     }
 
     @Override
     public int size() {
-        return ((Number) invoke(size)).intValue();
+        return direct != null ? direct.ft$size() : ((Number) invoke(size)).intValue();
     }
 
     @Override
     public void add(int index, WorldRenderer element) {
-        invoke(addAt, index, element);
+        if (direct != null) direct.ft$add(index, element);
+        else invoke(addAt, index, element);
         modCount++;
     }
 
     @Override
     public WorldRenderer remove(int index) {
-        WorldRenderer removed = (WorldRenderer) invoke(removeAt, index);
+        WorldRenderer removed = (WorldRenderer) (direct != null ? direct.ft$remove(index) : invoke(removeAt, index));
         modCount++;
         return removed;
     }
 
     @Override
     public void clear() {
-        invoke(clear);
+        if (direct != null) direct.ft$clear();
+        else invoke(clear);
         modCount++;
     }
 
