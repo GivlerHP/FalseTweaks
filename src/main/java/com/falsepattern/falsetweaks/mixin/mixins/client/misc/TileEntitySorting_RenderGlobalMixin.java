@@ -25,6 +25,8 @@ package com.falsepattern.falsetweaks.mixin.mixins.client.misc;
 import lombok.val;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import com.falsepattern.falsetweaks.modules.misc.CachedDistanceSorter;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -40,6 +42,8 @@ import java.util.List;
 
 @Mixin(RenderGlobal.class)
 public abstract class TileEntitySorting_RenderGlobalMixin {
+    @Unique
+    private final CachedDistanceSorter<TileEntity> falsetweaks$distanceSorter = new CachedDistanceSorter<>();
     @SuppressWarnings("rawtypes")
     @Shadow
     public List tileEntities;
@@ -66,6 +70,6 @@ public abstract class TileEntitySorting_RenderGlobalMixin {
             require = 1)
     private void sortTEs(EntityLivingBase player, ICamera camera, float time, CallbackInfo ci) {
         val TEs = (List<TileEntity>) tileEntities;
-        TEs.sort(Comparator.comparingDouble((te) -> -AABBDistance(te.getRenderBoundingBox(), player)));
+        falsetweaks$distanceSorter.sort(TEs, te -> AABBDistance(te.getRenderBoundingBox(), player));
     }
 }
